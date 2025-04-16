@@ -12,6 +12,8 @@ import matplotlib.pyplot as plt
 import random
 from torchvision.transforms import functional as TF
 
+
+
 class BubbleDataset(Dataset):
     def __init__(self, image_paths, label_paths, augment=False):
         self.image_paths = image_paths
@@ -36,7 +38,8 @@ class BubbleDataset(Dataset):
         image = Image.open(image_path).convert('L')
         label = Image.open(label_path)
 
-        original_image_tensor = TF.to_tensor(image).expand(3, -1, -1)
+        # original_image_tensor = TF.to_tensor(image).expand(3, -1, -1)
+        original_image_tensor = TF.to_tensor(image)
 
         image = self.center_crop(image, target_width=750)
         label = self.center_crop(label, target_width=750)
@@ -81,7 +84,7 @@ def extract_dataset_number(path):
     return int(path.split('_')[-1].split('.')[0])
 
 
-if __name__ == "__main__":
+def create_ultrasound_dataloaders():
     # STEP 2: Parsing and Splitting Data Based on Dataset Number
     all_images = sorted(glob.glob('../Data/US_2/*.jpg'))
     all_labels = [img_path.replace('US', 'Label').replace('.jpg', '.png') for img_path in all_images]
@@ -139,3 +142,5 @@ if __name__ == "__main__":
 
     print("Label dtype:", lbl_batch.dtype)
     print("Label values:", lbl_batch.unique())
+
+    return train_loader , val_loader

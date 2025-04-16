@@ -2,11 +2,11 @@ import torch.nn as nn
 import torch
 from torchvision.models.segmentation import deeplabv3_resnet101, DeepLabV3_ResNet101_Weights
 
-def get_deeplab_model(num_classes=2, use_cuda=True):
+def get_torchvision_deeplabv3(num_classes=1, use_cuda=True):
     """
     Load DeepLabV3 with a ResNet-101 backbone, modify the classifier for a custom number of output classes,
-    and optionally move it to CUDA.
-
+    and modify the first convolution layer for grayscale input (1 channel).
+    
     Args:
         num_classes (int): Number of output segmentation classes.
         use_cuda (bool): Whether to move the model to GPU if available.
@@ -18,6 +18,9 @@ def get_deeplab_model(num_classes=2, use_cuda=True):
         weights = DeepLabV3_ResNet101_Weights.DEFAULT
         model = deeplabv3_resnet101(weights=weights)
         
+        # Modify the first convolution layer for grayscale input (1 channel)
+        model.backbone.conv1 = nn.Conv2d(in_channels=1, out_channels=64, kernel_size=7, stride=2, padding=3, bias=False)
+
         # Modify the classifier for custom number of classes
         model.classifier[4] = nn.Conv2d(256, num_classes, kernel_size=1)
         
